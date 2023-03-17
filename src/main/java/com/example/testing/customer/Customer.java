@@ -1,14 +1,20 @@
 package com.example.testing.customer;
 
+import javax.validation.constraints.NotBlank;
 import java.util.UUID;
 
 public class Customer {
     private UUID id;
+
+    @NotBlank
     private String name;
+
+    @NotBlank
     private String phoneNumber;
 
     public Customer(UUID id, String name, String phoneNumber) {
         this.id = id;
+
         this.name = name;
         this.phoneNumber = phoneNumber;
     }
