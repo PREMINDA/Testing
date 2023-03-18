@@ -2,10 +2,13 @@ package com.example.testing.customer;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 @DataJpaTest(
         properties = {
@@ -27,7 +30,18 @@ class CustomerRepositoryTest {
     @Test
     void itShouldSaveCustomer() {
         //Given
+        UUID id = UUID.randomUUID();
+        Customer customer = new Customer(id, "Abel", "0000");
+
         //When
-        //Then 
+        underTest.save(customer);
+
+        //Then
+        Optional<Customer> optionalCustomer = underTest.findById(id);
+        assertThat(optionalCustomer)
+                .isPresent()
+                .hasValueSatisfying(c->{
+                    assertThat(c.toString()).isEqualTo(customer.toString());
+                });
     }
 }
