@@ -1,9 +1,15 @@
 package com.example.testing.customer;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
 import javax.validation.constraints.NotBlank;
 import java.util.UUID;
 
+@Entity
 public class Customer {
+
+    @Id
     private UUID id;
 
     @NotBlank
@@ -17,6 +23,10 @@ public class Customer {
 
         this.name = name;
         this.phoneNumber = phoneNumber;
+    }
+
+    public Customer() {
+
     }
 
     public UUID getId() {
