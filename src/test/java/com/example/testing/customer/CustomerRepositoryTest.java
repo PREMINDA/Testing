@@ -44,4 +44,16 @@ class CustomerRepositoryTest {
                     assertThat(c.toString()).isEqualTo(customer.toString());
                 });
     }
+
+    @Test
+    void itNotShouldSelectCustomerByPhoneNumberWhenNumberDoesNotExists() {
+        // Given
+        String phoneNumber = "0000";
+
+        // When
+        Optional<Customer> optionalCustomer = underTest.selectCustomerByPhoneNumber(phoneNumber);
+
+        // Then
+        assertThat(optionalCustomer).isNotPresent();
+    }
 }

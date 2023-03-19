@@ -98,6 +98,7 @@ class CustomerRegistrationServiceTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining(String.format("phone number [%s] is taken", phoneNumber));
 
+
         then(customerRepository).should(never()).save(any());
     }
 }
