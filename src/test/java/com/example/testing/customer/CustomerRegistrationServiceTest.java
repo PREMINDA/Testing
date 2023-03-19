@@ -13,8 +13,11 @@ import java.util.UUID;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
 
 class CustomerRegistrationServiceTest {
 
@@ -53,5 +56,48 @@ class CustomerRegistrationServiceTest {
         Customer customerArgumentCaptorValue= customerArgumentCaptor.getValue();
         assertThat(customerArgumentCaptorValue.toString())
                 .isEqualTo(customer.toString());
+    }
+
+    @Test
+    void itShouldNotSaveCustomerWhenCustomerExists() {
+        //Given a phone number and customer
+        UUID id = UUID.randomUUID();
+        String phoneNumber = "00009999";
+        Customer customer = new Customer(id,"Alina", phoneNumber);
+
+        // ... a request
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(customer);
+
+        // ... ... an existing customer is returned
+        given(customerRepository.selectCustomerByPhoneNumber(phoneNumber)).willReturn(Optional.of(customer));
+
+        //When
+        underTest.registerNewCustomer(request);
+
+        //Then
+        then(customerRepository).should(never()).save(any());
+    }
+
+    @Test
+    void itShouldThrowWhenPhoneNumberIsTaken() {
+        //Given
+        UUID id = UUID.randomUUID();
+        String phoneNumber = "00009999";
+        Customer customerOne = new Customer(id,"Alina", phoneNumber);
+        Customer customerTwo = new Customer(id,"mari", phoneNumber);
+
+        // ... a request
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(customerTwo);
+
+        // ... ... an existing customer is returned
+        given(customerRepository.selectCustomerByPhoneNumber(phoneNumber)).willReturn(Optional.of(customerOne));
+
+        //When
+        //Then
+        assertThatThrownBy(() -> underTest.registerNewCustomer(request))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(String.format("phone number [%s] is taken", phoneNumber));
+
+        then(customerRepository).should(never()).save(any());
     }
 }
