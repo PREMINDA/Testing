@@ -1,14 +1,14 @@
 package com.example.testing.payment;
-
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import org.springframework.data.annotation.Id;
+import jakarta.persistence.Id;
+
 
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
+@Entity
 public class Payment {
 
     @Id
@@ -19,22 +19,28 @@ public class Payment {
 
     private BigDecimal amount;
 
+    private Currency currency;
 
     private String source;
 
     private String description;
 
+
     public Payment(Long paymentId,
                    UUID customerId,
                    BigDecimal amount,
+                   Currency currency,
                    String source,
                    String description) {
         this.paymentId = paymentId;
         this.customerId = customerId;
         this.amount = amount;
+        this.currency = currency;
         this.source = source;
         this.description = description;
     }
+
+
 
     public Payment() {
     }
@@ -63,6 +69,9 @@ public class Payment {
         this.amount = amount;
     }
 
+    public Currency getCurrency() {return currency;}
+
+    public void setCurrency(Currency currency) {this.currency = currency;}
 
     public String getSource() {
         return source;
