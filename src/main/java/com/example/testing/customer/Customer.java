@@ -1,6 +1,7 @@
 package com.example.testing.customer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
@@ -15,9 +16,11 @@ public class Customer {
     private UUID id;
 
     @NotBlank
+    @Column(nullable = false)
     private String name;
 
     @NotBlank
+    @Column(nullable = false,unique = true)
     private String phoneNumber;
 
     public Customer(UUID id, String name, String phoneNumber) {

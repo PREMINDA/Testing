@@ -3,11 +3,13 @@ package com.example.testing.customer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 @DataJpaTest(
@@ -55,5 +57,29 @@ class CustomerRepositoryTest {
 
         // Then
         assertThat(optionalCustomer).isNotPresent();
+    }
+
+    @Test
+    void itShouldNotSaveCustomerWhenNameIsNull() {
+        //Given
+        UUID id = UUID.randomUUID();
+        Customer customer = new Customer(id, null, "0000");
+        //When
+        //Then
+        assertThatThrownBy(()->underTest.save(customer))
+                .hasMessageContaining("not-null property references a null or transient value : com.example.testing.customer.Customer.name")
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void itShouldNotSaveCustomerWhenPhoneNumberIsNull() {
+        //Given
+        UUID id = UUID.randomUUID();
+        Customer customer = new Customer(id, "Nathen", null);
+        //When
+        //Then
+        assertThatThrownBy(()->underTest.save(customer))
+                .hasMessageContaining("not-null property references a null or transient value : com.example.testing.customer.Customer.phoneNumber")
+                .isInstanceOf(DataIntegrityViolationException.class);
     }
 }
