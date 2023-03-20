@@ -48,7 +48,7 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void itNotShouldSelectCustomerByPhoneNumberWhenNumberDoesNotExists() {
+    void itShouldNotSelectCustomerByPhoneNumberWhenNumberDoesNotExists() {
         // Given
         String phoneNumber = "0000";
 
