@@ -79,6 +79,31 @@ class CustomerRegistrationServiceTest {
     }
 
     @Test
+    void itShouldSaveNewCustomerWhenIdIsNull() {
+        //Given
+        String phoneNumber = "00009999";
+        Customer customer = new Customer(null,"Alina", phoneNumber);
+
+        // ... a request
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(customer);
+
+        // ... No customer with phone number passed
+        given(customerRepository.selectCustomerByPhoneNumber(phoneNumber)).willReturn(Optional.empty());
+
+        //When
+        underTest.registerNewCustomer(request);
+        //Then
+        then(customerRepository).should().save(customerArgumentCaptor.capture());
+        Customer customerArgumentCaptorValue= customerArgumentCaptor.getValue();
+        assertThat(customerArgumentCaptorValue)
+                .usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(customer);
+        assertThat(customerArgumentCaptorValue.getId()).isNotNull();
+
+    }
+
+    @Test
     void itShouldThrowWhenPhoneNumberIsTaken() {
         //Given
         UUID id = UUID.randomUUID();
@@ -99,6 +124,6 @@ class CustomerRegistrationServiceTest {
                 .hasMessageContaining(String.format("phone number [%s] is taken", phoneNumber));
 
 
-        then(customerRepository).should(never()).save(any());
+        then(customerRepository).should(never()).save(any(Customer.class));
     }
 }

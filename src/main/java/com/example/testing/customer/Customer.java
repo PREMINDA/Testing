@@ -1,5 +1,6 @@
 package com.example.testing.customer;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
@@ -7,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.UUID;
 
 @Entity
+@JsonIgnoreProperties(value = {"id"}, allowGetters = true)
 public class Customer {
 
     @Id
