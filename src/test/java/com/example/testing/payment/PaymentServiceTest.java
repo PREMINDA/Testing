@@ -14,10 +14,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 
 class PaymentServiceTest {
 
@@ -81,5 +84,24 @@ class PaymentServiceTest {
                 .isEqualTo(paymentRequest.getPayment());
 
         assertThat(paymentArgumentCaptorValue.getCustomerId()).isEqualTo(customerId);
+    }
+
+    @Test
+    void itShouldNotMakePaymentIfCustomerNotExists() {
+
+        //Given
+        UUID customerId = UUID.randomUUID();
+
+        given(customerRepository.findById(customerId)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> underTest.chargeCard(customerId,new PaymentRequest(new Payment())))
+                .hasMessageContaining(String.format("Customer with id [%s] not found",customerId))
+                .isInstanceOf(IllegalStateException.class);
+        // When
+        // Then
+
+        // ... No interactions with PaymentCharger not PaymentRepository
+        then(cardPaymentCharger).shouldHaveNoInteractions();
+        then(paymentRepository).shouldHaveNoInteractions();
     }
 }
