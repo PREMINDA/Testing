@@ -1,5 +1,7 @@
 package com.example.testing.payment;
 
+import java.math.BigDecimal;
+
 public class PaymentRequest {
     private final Payment payment;
 
@@ -17,4 +19,5 @@ public class PaymentRequest {
                 "payment=" + payment +
                 '}';
     }
+
 }
