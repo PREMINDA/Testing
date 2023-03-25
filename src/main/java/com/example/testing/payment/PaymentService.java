@@ -29,10 +29,12 @@ public class PaymentService {
             throw new IllegalStateException(String.format("Customer with id [%s] not found",customerId));
         }
 
-        boolean isCurrencySupport = ACCEPTED_CURRENCIES.stream()
-                .anyMatch(c->c.equals(request.getPayment().getCurrency()));
+        boolean isCurrencySupport = ACCEPTED_CURRENCIES.contains(request.getPayment().getCurrency());
         if (!isCurrencySupport){
-            throw new IllegalStateException(String.format("Currency [%s] not supported",request.getPayment().getCurrency()));
+            String message = String.format(
+                    "Currency [%s] not supported",
+                    request.getPayment().getCurrency());
+            throw new IllegalStateException(message);
         }
 
         CardPaymentCharge cardPaymentCharge = cardPaymentCharger.chargeCard(
