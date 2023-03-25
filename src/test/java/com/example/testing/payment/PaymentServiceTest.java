@@ -138,4 +138,42 @@ class PaymentServiceTest {
         then(cardPaymentCharger).shouldHaveNoInteractions();
         then(paymentRepository).shouldHaveNoInteractions();
     }
+
+    @Test
+    void itShouldThrowWhenCardIsNotCharged() {
+        // Given
+        UUID customerId = UUID.randomUUID();
+
+        // ... Customer exists
+        given(customerRepository.findById(customerId)).willReturn(Optional.of(mock(Customer.class)));
+
+        // ... Euros
+        Currency currency = Currency.USD;
+
+        // ... Payment request
+        PaymentRequest paymentRequest = new PaymentRequest(
+                new Payment(
+                        null,
+                        null,
+                        new BigDecimal("100.00"),
+                        currency,
+                        "card123xx",
+                        "Donation"
+                )
+        );
+
+        // ... Card is not charged successfully
+        given(cardPaymentCharger.chargeCard(
+                paymentRequest.getPayment().getSource(),
+                paymentRequest.getPayment().getAmount(),
+                paymentRequest.getPayment().getCurrency(),
+                paymentRequest.getPayment().getDescription()
+        )).willReturn(new CardPaymentCharge(false));
+        //When
+        assertThatThrownBy(()->underTest.chargeCard(customerId,paymentRequest))
+                .hasMessageContaining(String.format("Card not debited for customer %s", customerId))
+                .isInstanceOf(IllegalStateException.class);
+        //Then
+        then(paymentRepository).shouldHaveNoInteractions();
+    }
 }
