@@ -15,10 +15,13 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 class StripeServiceTest {
 
@@ -73,5 +76,25 @@ class StripeServiceTest {
         // card is debited successfully
         assertThat(cardPaymentCharge).isNotNull();
         assertThat(cardPaymentCharge.isCardDebited()).isTrue();
+    }
+
+    @Test
+    void itShouldNotChargeWhenApiThrowsException() throws StripeException {
+        // Given
+        String cardSource = "0x0x0x";
+        BigDecimal amount = new BigDecimal("10.00");
+        Currency currency = Currency.USD;
+        String description = "Zakat";
+
+        // Throw exception when stripe api is called
+        StripeException stripeException = mock(StripeException.class);
+        doThrow(stripeException).when(stripeApi).create(anyMap(), any());
+
+        // When
+        // Then
+        assertThatThrownBy(() -> underTest.chargeCard(cardSource, amount, currency, description))
+                .isInstanceOf(IllegalStateException.class)
+                .hasRootCause(stripeException)
+                .hasMessageContaining("Cannot make stripe charge");
     }
 }
